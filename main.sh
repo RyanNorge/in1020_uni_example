@@ -1,2 +1,2 @@
 #!/usr/bin/env bash
-uv run fastapi dev server.py
+uv run fastapi dev backend/server.py
