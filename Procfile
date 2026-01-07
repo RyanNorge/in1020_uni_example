@@ -1,1 +1,1 @@
-web: uv run fastapi server.py --host 0.0.0.0
+web: fastapi server.py --host 0.0.0.0
