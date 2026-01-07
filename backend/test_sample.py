@@ -22,5 +22,5 @@ def test_root():
     assert response.json() == {"Hello": "World"}
 
 
-def test_failing():
+def test_failing_2():
     assert False
