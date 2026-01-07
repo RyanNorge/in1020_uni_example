@@ -24,7 +24,9 @@ uv run pytest
 
 ## A bit about the project
 
-No AI or code generation was used, just good ol' fashioned Google-ing, although I did copy/paste the Github Action test runner from another project.
+No AI or code generation was used, just good ol' fashioned Google-ing.
+
+I did reuse some code from another project for the Github Action, and the Docker build test script. The Dockerfile comes from Astral, the makes of UV.
 
 Pytest is used for testing. The server endpoints are tested through a client over localhost, not just directly from code.
 
