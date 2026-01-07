@@ -10,8 +10,12 @@ curl -LsSf https://astral.sh/uv/install.sh | sh
 ```
 
 
-Run via the entrypoint with...
+Run via the entrypoint with ...
 ```
 sh main.sh
 ```
 
+Run tests with ...
+```
+uv run pytest
+```
