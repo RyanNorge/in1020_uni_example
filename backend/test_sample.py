@@ -20,7 +20,3 @@ test_client = TestClient(
 def test_root():
     response = test_client.get("/")
     assert response.json() == {"Hello": "World"}
-
-
-def test_failing_2():
-    assert False
