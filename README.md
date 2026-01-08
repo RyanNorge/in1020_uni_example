@@ -27,7 +27,7 @@ Run just tests with ...
 uv run pytest
 ```
 
-Also, there is a script to test a docker build. You'll need the Docker CLI to run it. I suggest getting [Docker Desktop](https://www.docker.com/products/docker-desktop/) if you're on a Mac.
+Also, there is a script to test a docker build. You'll need the Docker CLI to run it. I suggest getting [Docker Desktop](https://www.docker.com/products/docker-desktop/) if you're on a Mac. It should be run from the root of the app.
 
 ## Cool Things I Did
 - Continuous Integration and Deployment
@@ -35,7 +35,7 @@ Also, there is a script to test a docker build. You'll need the Docker CLI to ru
 - Protected main branch. Cannot be pushed unless tests pass.
 - Running in Docker container on Digital Ocean App Platform
 - DNS link to a subdomain
-- Bash script to build local docker image, run tests in container, and delete image.
+- Bash script to build local docker image, run tests within container, and delete image.
 - Proper handling of environment variables.
 - No AI code generation. No chatbot help, but I did read the AI summary thing when I Googled a couple of times.
 
