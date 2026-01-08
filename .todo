@@ -1,0 +1,5 @@
+[] build boolean algebra solver for circuits string
+[] quick UI with a HTML file
+[] logging
+[] add a license
+[] valadate data with pydantic
