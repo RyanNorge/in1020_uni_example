@@ -42,23 +42,20 @@ def format_string(string: str) -> str:
 
 class CircuitSolver:
     def __init__(self, circuit_string: str) -> None:
-        self._cir_string = circuit_string.upper()
-        self._invert = False
+        self._cir_string = circuit_string
+        self._invert: bool
         self._operation: Literal["and", "or", "xor"]
+        self._left: CircuitSolver
+        self._right: CircuitSolver
 
-        # condition for a leaf. should be a single character (excluding "X")
+        # condition for a leaf. should be an empty string or a single char
+        if not self._cir_string:
+            return
         if len(self._cir_string) == 1:
             if self._cir_string in NOR_LETTERS:
                 return
             else:
                 raise ValueError
-
-        # check to see if this node should be inverted
-        if self._cir_string[0] == "!":
-            self._invert = True
-
-            # remove inversion char from the start of the string
-            self._cir_string = self._cir_string[1:]
 
         # get inversion status and args for child nodes
         invert, left_side, operator, right_side = self._parse_inversion_and_child_nodes(
@@ -84,20 +81,50 @@ class CircuitSolver:
         """
         invert, left_side, operator, right_side = False, "A", "and", "B"
 
+        # error if an empty string came in
+        if not string:
+            raise ValueError
+
+        len_of_string = len(string)
+
+        # error if first char is an invalid operator
+        if string[0] in "*+X^":
+            raise ValueError
+
+        # two chars
+        if len_of_string == 2:
+            char_one = string[0]
+            char_two = string[1]
+
+            char_one_is_letter = char_one in NOR_LETTERS
+            char_two_is_letter = char_two in NOR_LETTERS
+
+            # pattern "AB"
+            if char_one_is_letter and char_two_is_letter:
+                return False, char_one, "and", char_two
+
+            # pattern "!A"
+            if char_one == "!" and char_two_is_letter:
+                return True, char_two, "or", ""
+
+        # we now know that the first char is either a letter or in ["!()"]
+
         # TODO check for parenthesis
         "()"
 
+        # TODO quick fix. not always true.
         # check to see if this node should be inverted
         if self._cir_string[0] == "!":
             invert = True
 
-        char_one = string[0]
-        if char_one not in NOR_LETTERS:
-            raise ValueError
-
-        char_two = string[1]
-
         # pattern "AB"
+        left_side = ""
+        for char in string:
+            # break when finding an operator or parenthesis
+            if char not in NOR_LETTERS or char == "!":
+                break
+            left_side += char
+
         if char_two in NOR_LETTERS:
             return invert, char_one, "and", char_two
 

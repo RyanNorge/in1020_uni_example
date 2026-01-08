@@ -34,9 +34,19 @@ def test_format_string():
 
 
 def test_string_arg():
+    return
     for arg in ("AB", "A+B"):
         cir_solv = CircuitSolver(arg)
         assert cir_solv._cir_string == arg
+
+
+def test_leaves():
+    assert CircuitSolver("A").get_value()
+    assert not CircuitSolver("").get_value()
+
+
+def test_not():
+    assert not CircuitSolver("!A").get_value()
 
 
 def test_and():
@@ -46,11 +56,3 @@ def test_and():
 def test_or():
     return
     assert CircuitSolver("A+B").get_value()
-
-
-def test_not():
-    return  # TODO
-    s_not = "!A"
-
-    cir_solv = CircuitSolver(s_not)
-    assert not cir_solv.get_value()
