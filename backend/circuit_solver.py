@@ -7,10 +7,11 @@ from string import ascii_uppercase
 # removing "X" as I'm going to have the user type it for an XOR gate
 NOR_LETTERS = ascii_uppercase.replace("X", "") + "ÆØÅ"
 
-VALID_CHARS = NOR_LETTERS + "()*+!X \n"
+VALID_CHARS = NOR_LETTERS + "()*+!X^ \n"
 
 
-def validate_string(string: str) -> bool:
+def valid_string(string: str) -> bool:
+    """Validates that a string has valid chars for the tree. String still needs to be formatted."""
     # empty string
     if not string:
         return False
@@ -32,6 +33,7 @@ def validate_string(string: str) -> bool:
 
 
 def format_string(string: str) -> str:
+    """Formats a validated string to be passed into the CircuitSolver class."""
     string = string.upper()
     string = string.replace(" ", "")
     string = string.replace("\n", "")

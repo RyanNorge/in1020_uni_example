@@ -1,28 +1,25 @@
-from circuit_solver import CircuitSolver, validate_string, format_string
-
-s_blank = ""
-s_and = "AB"
-s_or = "A+B"
-s_not = "!A"
+from circuit_solver import CircuitSolver, valid_string, format_string
 
 
 def test_valid_strings():
-    assert validate_string("AB")
-    assert validate_string("A+B")
-    assert validate_string("A + B")
-    assert validate_string("(A + B) \n")
-    assert validate_string("(A + B) + C")
-    assert validate_string("!A")
-    assert validate_string("!Ø+Å")
+    assert valid_string("AB")
+    assert valid_string("A+B")
+    assert valid_string("A + B")
+    assert valid_string("(A + B) \n")
+    assert valid_string("(A + B) + C")
+    assert valid_string("!A")
+    assert valid_string("!Ø+Å")
+    assert valid_string("AxB")
+    assert valid_string("A^B")
 
 
 def test_invalid_strings():
-    assert not validate_string("A-B")
-    assert not validate_string("!")
-    assert not validate_string(" ")
-    assert not validate_string("")
-    assert not validate_string("(")
-    assert not validate_string("( ()")
+    assert not valid_string("A-B")
+    assert not valid_string("!")
+    assert not valid_string(" ")
+    assert not valid_string("")
+    assert not valid_string("(")
+    assert not valid_string("( ()")
 
 
 def test_format_string():
@@ -32,28 +29,22 @@ def test_format_string():
 
 
 def test_string_arg():
-    for arg in (s_and, s_or):
+    for arg in ("AB", "A+B"):
         cir_solv = CircuitSolver(arg)
         assert cir_solv._cir_string == arg
 
 
-def test_blank():
-    return
-    cir_solv = CircuitSolver(s_blank)
-    assert cir_solv.get_value()
-
-
 def test_and():
-    cir_solv = CircuitSolver(s_and)
-    assert cir_solv.get_value()
+    assert CircuitSolver("AB").get_value()
 
 
 def test_or():
-    cir_solv = CircuitSolver(s_or)
-    assert cir_solv.get_value()
+    assert CircuitSolver("A+B").get_value()
 
 
 def test_not():
     return  # TODO
+    s_not = "!A"
+
     cir_solv = CircuitSolver(s_not)
     assert not cir_solv.get_value()
