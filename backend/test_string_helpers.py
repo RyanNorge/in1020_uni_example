@@ -1,30 +1,30 @@
-from string_helpers import valid_string, format_string
+from string_helpers import is_valid_string, format_string
 
 
 def test_valid_strings():
-    assert valid_string("AB")
-    assert valid_string("A+B")
-    assert valid_string("A + B")
-    assert valid_string("(A + B) \n")
-    assert valid_string("(A + B) + C")
-    assert valid_string("!A")
-    assert valid_string("AxB")
-    assert valid_string("A^B")
-    assert valid_string("(A^B)+!(C+D)")
+    assert is_valid_string("AB")
+    assert is_valid_string("A+B")
+    assert is_valid_string("A + B")
+    assert is_valid_string("(A + B) \n")
+    assert is_valid_string("(A + B) + C")
+    assert is_valid_string("!A")
+    assert is_valid_string("AxB")
+    assert is_valid_string("A^B")
+    assert is_valid_string("(A^B)+!(C+D)")
 
 
 def test_norwegian_chars():
-    assert valid_string("ÆØ+Å")
-    assert valid_string("!Ø+Å")
+    assert is_valid_string("ÆØ+Å")
+    assert is_valid_string("!Ø+Å")
 
 
 def test_invalid_strings():
-    assert not valid_string("A-B")
-    assert not valid_string("!")
-    assert not valid_string(" ")
-    assert not valid_string("")
-    assert not valid_string("(")
-    assert not valid_string("( ()")
+    assert not is_valid_string("A-B")
+    assert not is_valid_string("!")
+    assert not is_valid_string(" ")
+    assert not is_valid_string("")
+    assert not is_valid_string("(")
+    assert not is_valid_string("( ()")
 
 
 def test_xor_char():

@@ -9,7 +9,7 @@ NOR_LETTERS = ascii_uppercase.replace("X", "") + "ÆØÅ"
 VALID_CHARS = NOR_LETTERS + "()*+!xX^ \n"
 
 
-def valid_string(string: str) -> bool:
+def is_valid_string(string: str) -> bool:
     """Returns whether a string has valid chars for the tree. Does not format the string."""
 
     string = string.strip()
