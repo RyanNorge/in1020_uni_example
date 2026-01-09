@@ -1,4 +1,6 @@
-from typing import Literal, Tuple
+import random
+
+from typing import Literal, Tuple, Dict
 from string import ascii_uppercase
 
 from string_helpers import format_string, is_valid_string
@@ -12,17 +14,18 @@ NOR_LETTERS = ascii_uppercase.replace("X", "") + "ÆØÅ"
 VALID_CHARS = NOR_LETTERS + "()*+!xX^ \n"
 
 
-class CircuitSolver:
+class CircuitSolverOne:
     def __init__(self, circuit_string: str, _is_root=True) -> None:
         self._value = None
         self._is_leaf = False
+        self._has_leaf = False
         self._is_root = _is_root
 
         self._cir_string: str
         self._invert: bool
         self._operation: Literal["and", "or", "xor"]
-        self._left: CircuitSolver
-        self._right: CircuitSolver
+        self._left: CircuitSolverOne
+        self._right: CircuitSolverOne
 
         circuit_string = format_string(circuit_string)
 
@@ -42,9 +45,12 @@ class CircuitSolver:
         )
 
         self._invert = invert
-        self._left = CircuitSolver(left_side, _is_root=False)
+        self._left = CircuitSolverOne(left_side, _is_root=False)
         self._operation = operator
-        self._right = CircuitSolver(right_side, _is_root=False)
+        self._right = CircuitSolverOne(right_side, _is_root=False)
+
+        if self._left._is_leaf or self._right._is_leaf:
+            self._has_leaf = True
 
     def _check_for_leaf(self) -> None:
         """Check if node is a leaf, and set instance variables if it is"""
@@ -59,7 +65,7 @@ class CircuitSolver:
                 # True on an empty string on a leaf.
                 # This is so that an "and" operation will be evaluated on leaves
                 # before any "or" operations are evaluated.
-                self._value = True
+                self._value = False
             return
 
         # populated leaf is single char
@@ -110,14 +116,14 @@ class CircuitSolver:
 
             # pattern "!A"
             if char_one == "!" and char_two_is_letter:
-                return True, char_two, "and", ""
+                return True, char_two, "or", ""
 
         # TODO check for parenthesis
         "()"
 
         # pattern "!!...", "!(..."
         if string[0:2] in ("!!", "!("):
-            return True, string[1:], "and", ""
+            return True, string[1:], "or", ""
 
         # pattern "!AB[operator]...", "A!B[operator]...", "!A!B[operator]...", "ABC[operator]..."
         left_side = ""
@@ -207,9 +213,24 @@ class CircuitSolver:
 
         #### definately not done with stuff
 
+        # if self._left._is_leaf and self._right._is_leaf:
+        #     if self._invert:
+        #         self._value = False
+        #     else:
+        #         self._value = True
+        #     return
+
         # get values from both child branches
         left = self._left._value
         right = self._right._value
+
+        if self._has_leaf:
+            if isinstance(left, bool) and isinstance(right, bool):
+                evaluated = left or right
+                if self._invert:
+                    return not evaluated
+                else:
+                    return evaluated
 
         if left is None:
             self._left._evaluate("and")
@@ -237,3 +258,100 @@ class CircuitSolver:
 
         # self._left._evaluate(_stage)
         # self._right._evaluate(_stage)
+
+
+#####
+#####
+#####
+
+
+class CircuitSolverTwo:
+    def __init__(
+        self,
+        circuit_string: str,
+        randomize_bools=False,
+        _char_dict: Dict[str, bool] | None = None,
+    ) -> None:
+        self._value = None
+
+        self._cir_string: str
+        self._char_dict: Dict[str, bool]
+        self._invert: bool
+        self._operation: Literal["and", "or", "xor"]
+        self._left: CircuitSolverTwo
+        self._right: CircuitSolverTwo
+
+        circuit_string = format_string(circuit_string)
+
+        if not is_valid_string(circuit_string):
+            raise ValueError(f"Invalid string: {circuit_string}")
+
+        self._cir_string = circuit_string
+
+        self._set_char_dict(circuit_string, _char_dict, randomize_bools)
+
+        # if a leaf, then set values and early return
+        self._check_for_leaf()
+        if self._value is not None:
+            return
+
+        return
+
+        # get inversion status and args for child nodes
+        invert, left_side, operator, right_side = self._parse_inversion_and_child_nodes(
+            self._cir_string
+        )
+
+        self._invert = invert
+        self._left = CircuitSolverTwo(left_side)
+        self._operation = operator
+        self._right = CircuitSolverTwo(right_side)
+
+        if self._left._is_leaf or self._right._is_leaf:
+            self._has_leaf = True
+
+    def _set_char_dict(
+        self,
+        circuit_string: str,
+        char_dict: Dict[str, bool] | None,
+        randomize_bools: bool,
+    ) -> None:
+        """Set char bools dict"""
+
+        # char_dict from previous node was passed in
+        if char_dict is not None:
+            self._char_dict = char_dict
+            return
+
+        cir_set = set(circuit_string)
+        cir_set = cir_set.difference("()*+!xX^ \n")
+
+        self._char_dict = dict.fromkeys(cir_set, True)
+
+        if randomize_bools:
+            for key in self._char_dict:
+                self._char_dict[key] = random.choice((True, False))
+
+    def _check_for_leaf(self) -> None:
+        """Check if node is a leaf, and set instance variables if it is"""
+
+        # not a leaf
+        if len(self._cir_string) > 1:
+            return
+
+        # empty leaf is empty string
+        if not self._cir_string:
+            self._value = False
+            return
+
+        # populated leaf with single char
+        if self._cir_string in NOR_LETTERS:
+            self._value = True
+        else:
+            raise ValueError(f"Invalid single char string with {self._cir_string}")
+
+    def get_value(self) -> bool:
+        if self._value is not None:
+            return self._value
+
+        ...
