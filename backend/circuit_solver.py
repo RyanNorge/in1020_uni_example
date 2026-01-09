@@ -14,19 +14,17 @@ class CircuitSolver:
     def __init__(self, circuit_string: str) -> None:
         self._cir_string = circuit_string
         self._value = None
+        self._is_leaf = False
+
         self._invert: bool
         self._operation: Literal["and", "or", "xor"]
         self._left: CircuitSolver
         self._right: CircuitSolver
 
-        # condition for a leaf. should be an empty string or a single char
-        if not self._cir_string:
+        # if a leaf, then set values and early return
+        self._check_for_leaf()
+        if self._is_leaf:
             return
-        if len(self._cir_string) == 1:
-            if self._cir_string in NOR_LETTERS:
-                return
-            else:
-                raise ValueError(f"Invalid string with {self._cir_string}")
 
         # get inversion status and args for child nodes
         invert, left_side, operator, right_side = self._parse_inversion_and_child_nodes(
@@ -34,9 +32,27 @@ class CircuitSolver:
         )
 
         self._invert = invert
-        self._right = CircuitSolver(left_side)
+        self._left = CircuitSolver(left_side)
         self._operation = operator
-        self._left = CircuitSolver(right_side)
+        self._right = CircuitSolver(right_side)
+
+    def _check_for_leaf(self) -> None:
+        """Check if node is a leaf, and set instance variables if it is"""
+
+        # empty leaf is empty string
+        if not self._cir_string:
+            self._is_leaf = True
+            self._value = False
+            return
+
+        # populated leaf is single char
+        if len(self._cir_string) == 1:
+            if self._cir_string in NOR_LETTERS:
+                self._is_leaf = True
+                self._value = True
+                return
+            else:
+                raise ValueError(f"Invalid string with {self._cir_string}")
 
     def _parse_inversion_and_child_nodes(
         self, string: str
@@ -102,6 +118,8 @@ class CircuitSolver:
             else:
                 return False, string[0:1], "and", string[1:]
 
+        # from here on is pattern "...[operator]..."
+
         # get operator and string for right branch node
         left_side_len = len(left_side)
         operator_char = string[left_side_len]
@@ -117,15 +135,7 @@ class CircuitSolver:
             case _:
                 raise ValueError(f"Invalid operator_char: {operator_char}")
 
-        # pattern "...[operator]..."
         return False, left_side, operator, right_side
-
-        if string[left_side_len] == "+":
-            return False, left_side, "or", string[left_side_len + 1 :]
-
-        raise NotImplementedError(
-            f"Not implimented for string {string} with left_side {len(left_side)}"
-        )
 
     def get_value(self) -> bool:
         """
@@ -133,23 +143,17 @@ class CircuitSolver:
         as determined by its child nodes and inversion status.
         """
 
-        # TODO move this to init
-        # condition for a populated leaf
-        if len(self._cir_string) == 1:
-            return True
-
-        # condition for an empty leaf
-        if len(self._cir_string) == 0:
-            return False
+        if self._is_leaf:
+            return self._value
 
         if self._value is not None:
             return self._value
 
         #### things will break here...
-        # self._left._evaluate(_stage="and", _branch=True)
-        # self._right._evaluate(_stage="and", _branch=True)
-        # self._left._evaluate(_stage="or", _branch=True)
-        # self._right._evaluate(_stage="or", _branch=True)
+        self._left._evaluate(_stage="and", _branch=True)
+        self._right._evaluate(_stage="and", _branch=True)
+        self._left._evaluate(_stage="or", _branch=True)
+        self._right._evaluate(_stage="or", _branch=True)
 
         # get values from both child branches
         left = self._left.get_value()
@@ -178,8 +182,8 @@ class CircuitSolver:
     def _evaluate(
         self, _stage: Literal["and", "or", None] = None, _branch=False
     ) -> None:
-        # if called directly on root node for some reason
-        if not _branch:
+        # do not run on root or leaves
+        if not _branch or self._is_leaf:
             return
 
         #### definately not done with stuff
