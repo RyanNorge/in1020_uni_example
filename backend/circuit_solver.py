@@ -1,6 +1,8 @@
 from typing import Literal, Tuple
 from string import ascii_uppercase
 
+from string_helpers import format_string, is_valid_string
+
 # using all caps is Python convention for declaring a "constant"
 # it's just like using "_" for a private variable. we just close our eyes and pretend :)
 
@@ -12,15 +14,22 @@ VALID_CHARS = NOR_LETTERS + "()*+!xX^ \n"
 
 class CircuitSolver:
     def __init__(self, circuit_string: str, _is_root=True) -> None:
-        self._cir_string = circuit_string
         self._value = None
         self._is_leaf = False
         self._is_root = _is_root
 
+        self._cir_string: str
         self._invert: bool
         self._operation: Literal["and", "or", "xor"]
         self._left: CircuitSolver
         self._right: CircuitSolver
+
+        circuit_string = format_string(circuit_string)
+
+        if not is_valid_string(circuit_string):
+            raise ValueError(f"Invalid string: {circuit_string}")
+
+        self._cir_string = circuit_string
 
         # if a leaf, then set values and early return
         self._check_for_leaf()
@@ -151,21 +160,25 @@ class CircuitSolver:
         as determined by its child nodes and inversion status.
         """
 
-        if self._is_leaf:
-            return self._value
-
+        # early return if value is already cached
         if self._value is not None:
             return self._value
 
         #### things will break here...
-        self._left._evaluate(_stage="and", _branch=True)
-        self._right._evaluate(_stage="and", _branch=True)
-        self._left._evaluate(_stage="or", _branch=True)
-        self._right._evaluate(_stage="or", _branch=True)
+        self._left._evaluate(_stage="and")
+        self._right._evaluate(_stage="and")
+        self._left._evaluate(_stage="or")
+        self._right._evaluate(_stage="or")
+
+        ### okfd
+        left = self._left._value
+        right = self._right._value
+
+        # return
 
         # get values from both child branches
-        left = self._left.get_value()
-        right = self._right.get_value()
+        # left = self._left.get_value()
+        # right = self._right.get_value()
 
         # perform operation between branches
         match self._operation:
@@ -187,14 +200,40 @@ class CircuitSolver:
 
         return value
 
-    def _evaluate(
-        self, _stage: Literal["and", "or", None] = None, _branch=False
-    ) -> None:
-        # do not run on root or leaves
-        if not _branch or self._is_leaf:
+    def _evaluate(self, _stage: Literal["and", "or"]) -> None:
+        # do not run if value already cached
+        if self._value is not None:
             return
 
         #### definately not done with stuff
 
-        self._left._evaluate(_stage, _branch=True)
-        self._right._evaluate(_stage, _branch=True)
+        # get values from both child branches
+        left = self._left._value
+        right = self._right._value
+
+        if left is None:
+            self._left._evaluate("and")
+            self._left._evaluate("or")
+            left = self._left._value
+
+        if right is None:
+            self._right._evaluate("and")
+            self._right._evaluate("or")
+            right = self._right._value
+
+        # perform operation between branches
+        match self._operation:
+            case "and":
+                value = left and right
+            case "or":
+                value = left or right
+            case "xor":
+                # TODO
+                raise NotImplementedError
+            case _:
+                raise ValueError
+
+        self._value = value
+
+        # self._left._evaluate(_stage)
+        # self._right._evaluate(_stage)
