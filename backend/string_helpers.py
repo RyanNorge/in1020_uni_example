@@ -16,7 +16,7 @@ def is_valid_string(string: str) -> bool:
 
     # empty string
     if not string:
-        return False
+        return True
 
     # invalid char in string
     for char in set(string):

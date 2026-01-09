@@ -2,6 +2,8 @@ from string_helpers import is_valid_string, format_string
 
 
 def test_valid_strings():
+    assert is_valid_string("")
+    assert is_valid_string(" ")
     assert is_valid_string("AB")
     assert is_valid_string("A+B")
     assert is_valid_string("A + B")
@@ -21,8 +23,6 @@ def test_norwegian_chars():
 def test_invalid_strings():
     assert not is_valid_string("A-B")
     assert not is_valid_string("!")
-    assert not is_valid_string(" ")
-    assert not is_valid_string("")
     assert not is_valid_string("(")
     assert not is_valid_string("( ()")
 
