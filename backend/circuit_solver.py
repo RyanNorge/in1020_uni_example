@@ -345,10 +345,11 @@ class CircuitSolverTwo:
             return
 
         # populated leaf with single char
-        if self._cir_string in NOR_LETTERS:
-            self._value = True
+        # this char will be the dictionary key to the saved bool value
+        if self._cir_string in self._char_dict:
+            self._value = self._char_dict[self._cir_string]
         else:
-            raise ValueError(f"Invalid single char string with {self._cir_string}")
+            raise ValueError(f"Invalid single char string: {self._cir_string}")
 
     def get_value(self) -> bool:
         if self._value is not None:

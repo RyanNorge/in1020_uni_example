@@ -144,3 +144,11 @@ def test_randomize_bools():
         if not all(random._char_dict.values()):
             return
     raise ValueError("Expected random bools were never found")
+
+
+def test_get_value_with_random_bools():
+    # This test could theoretically fail, but is good enough for this project.
+    for _ in range(1_000_000):
+        if not CircuitSolverTwo("A", randomize_bools=True).get_value():
+            return
+    raise ValueError("Expected random bools were never found")
