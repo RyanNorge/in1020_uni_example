@@ -11,10 +11,11 @@ VALID_CHARS = NOR_LETTERS + "()*+!xX^ \n"
 
 
 class CircuitSolver:
-    def __init__(self, circuit_string: str) -> None:
+    def __init__(self, circuit_string: str, _is_root=True) -> None:
         self._cir_string = circuit_string
         self._value = None
         self._is_leaf = False
+        self._is_root = _is_root
 
         self._invert: bool
         self._operation: Literal["and", "or", "xor"]
@@ -32,9 +33,9 @@ class CircuitSolver:
         )
 
         self._invert = invert
-        self._left = CircuitSolver(left_side)
+        self._left = CircuitSolver(left_side, _is_root=False)
         self._operation = operator
-        self._right = CircuitSolver(right_side)
+        self._right = CircuitSolver(right_side, _is_root=False)
 
     def _check_for_leaf(self) -> None:
         """Check if node is a leaf, and set instance variables if it is"""
@@ -42,7 +43,14 @@ class CircuitSolver:
         # empty leaf is empty string
         if not self._cir_string:
             self._is_leaf = True
-            self._value = False
+            if self._is_root:
+                # root should return false on an empty string
+                self._value = False
+            else:
+                # True on an empty string on a leaf.
+                # This is so that an "and" operation will be evaluated on leaves
+                # before any "or" operations are evaluated.
+                self._value = True
             return
 
         # populated leaf is single char
@@ -93,14 +101,14 @@ class CircuitSolver:
 
             # pattern "!A"
             if char_one == "!" and char_two_is_letter:
-                return True, char_two, "or", ""
+                return True, char_two, "and", ""
 
         # TODO check for parenthesis
         "()"
 
         # pattern "!!...", "!(..."
         if string[0:2] in ("!!", "!("):
-            return True, string[1:], "or", ""
+            return True, string[1:], "and", ""
 
         # pattern "!AB[operator]...", "A!B[operator]...", "!A!B[operator]...", "ABC[operator]..."
         left_side = ""
