@@ -11,3 +11,6 @@ wheels/
 
 # Environment Variables and Secrets
 .env
+
+# Local Dev Files
+no_git.py
