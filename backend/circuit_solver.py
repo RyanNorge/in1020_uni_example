@@ -289,6 +289,7 @@ class CircuitSolverTwo:
         self._cir_string = circuit_string
 
         self._set_char_dict(circuit_string, _char_dict, randomize_bools)
+        self._set_inversion()
 
         # if a leaf, then set values and early return
         self._check_for_leaf()
@@ -351,8 +352,20 @@ class CircuitSolverTwo:
         else:
             raise ValueError(f"Invalid single char string: {self._cir_string}")
 
+    def _set_inversion(self) -> None:
+        # check for empty string before indexing it
+        if self._cir_string:
+            is_inverted = self._cir_string[0] == "!"
+            self._invert = is_inverted
+        else:
+            self._invert = False
+
     def get_value(self) -> bool:
+        # early return if value is cached
         if self._value is not None:
-            return self._value
+            if self._invert:
+                return not self._value
+            else:
+                return self._value
 
         ...
