@@ -7,7 +7,7 @@ app = FastAPI()
 
 @app.get("/")
 async def read_root():
-    return {"Hello": "World"}
+    return "Hey there. Thanks for checking out the link. Truth is it's not quite ready, got a bit busy with sick kids and planleggingsdag so I've had less time this week, but I wanted to send in the application with the link before the deadline. Check back in a few days :)"
 
 
 @app.get("/items/{item_id}")
